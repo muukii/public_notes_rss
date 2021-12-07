@@ -1,14 +1,14 @@
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
+    title: `.Muukii`,
     author: {
-      name: `Kyle Mathews`,
-      summary: `who lives and works in San Francisco building useful things.`,
+      name: `Muukii`,
+      summary: `.Muukii`,
     },
-    description: `A starter blog demonstrating what Gatsby can do.`,
-    siteUrl: `https://gatsbystarterblogsource.gatsbyjs.io/`,
+    description: `.Muukii`,
+    siteUrl: `https://muukii.app`,
     social: {
-      twitter: `kylemathews`,
+      twitter: `muukii_app`,
     },
   },
   plugins: [
@@ -51,12 +51,6 @@ module.exports = {
     },
     `gatsby-transformer-sharp`,
     `gatsby-plugin-sharp`,
-    // {
-    //   resolve: `gatsby-plugin-google-analytics`,
-    //   options: {
-    //     trackingId: `ADD YOUR TRACKING ID HERE`,
-    //   },
-    // },
     {
       resolve: `gatsby-plugin-feed`,
       options: {
@@ -74,38 +68,35 @@ module.exports = {
         `,
         feeds: [
           {
-            serialize: ({ query: { site, allMarkdownRemark } }) => {
-              return allMarkdownRemark.nodes.map(node => {
-                return Object.assign({}, node.frontmatter, {
-                  description: node.excerpt,
-                  date: node.frontmatter.date,
-                  url: site.siteMetadata.siteUrl + node.fields.slug,
-                  guid: site.siteMetadata.siteUrl + node.fields.slug,
-                  custom_elements: [{ "content:encoded": node.html }],
-                })
+            serialize: ({ query: { site, allNotion } }) => {
+              console.log("Rss")
+              return allNotion.edges.map(node => {
+                return {
+                  title: node.node.title,
+                  url: node.node.raw.url,
+                  guid: node.node.raw.url,
+                }
               })
             },
             query: `
               {
-                allMarkdownRemark(
-                  sort: { order: DESC, fields: [frontmatter___date] },
-                ) {
-                  nodes {
-                    excerpt
-                    html
-                    fields {
-                      slug
-                    }
-                    frontmatter {
+                allNotion(sort: {order: DESC, fields: createdAt}) {
+                  edges {
+                    node {
+                      id
                       title
-                      date
+                      raw {
+                        id
+                        url
+                      }
+                      createdAt
                     }
                   }
                 }
               }
             `,
             output: "/rss.xml",
-            title: "Gatsby Starter Blog RSS Feed",
+            title: "Muukii",
           },
         ],
       },
@@ -128,5 +119,12 @@ module.exports = {
     // this (optional) plugin enables Progressive Web App + Offline functionality
     // To learn more, visit: https://gatsby.dev/offline
     // `gatsby-plugin-offline`,
+    {
+      resolve: require.resolve(`./plugins/gatsby-source-notion-db-index`),
+      options: {
+        token: process.env["notion_token"],
+        databaseId: process.env["notion_db_id"],
+      },
+    },
   ],
 }
