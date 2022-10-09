@@ -1,5 +1,7 @@
 import type { GatsbyConfig } from "gatsby"
 
+import path from "path"
+
 const config: GatsbyConfig = {
   siteMetadata: {
     title: `.Muukii`,
@@ -122,7 +124,7 @@ const config: GatsbyConfig = {
     // To learn more, visit: https://gatsby.dev/offline
     // `gatsby-plugin-offline`,
     {
-      resolve: require.resolve(`./plugins/gatsby-source-notion-db-index`),
+      resolve: "gatsby-source-notion-db-index",
       options: {
         token: process.env["notion_token"],
         databaseId: process.env["notion_db_id"],

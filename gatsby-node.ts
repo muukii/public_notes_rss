@@ -10,6 +10,8 @@ export const createPages: GatsbyNode["createPages"] = async ({
 }) => {
   const { createPage } = actions
 
+  console.log("Site: createPages")
+
   // // Define a template for blog post
   // const blogPost = path.resolve(`./src/templates/blog-post.js`)
 

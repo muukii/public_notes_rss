@@ -1,10 +1,51 @@
-import type { GatsbyNode } from "gatsby"
+import type { GatsbyNode, Reporter } from "gatsby"
 
-import fetch from "node-fetch"
+import { Client } from "@notionhq/client"
+import { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints"
 
 console.log("Plugin loading 🔥")
 
-export const onPreInit = () => console.log("Loaded gatsby-starter-plugin")
+const fetchPages = async (args: { client: Client; databaseID: string }, reporter: Reporter) => {
+	let hasMore = true
+	let startCursor: string | null = ""
+
+	const body = {
+		page_size: 100,
+		start_cursor: undefined as string | undefined,
+	}
+
+	const pages: any[] = []
+
+	while (hasMore) {
+		if (startCursor) {
+			body.start_cursor = startCursor
+		}
+
+		try {
+			const res: QueryDatabaseResponse = await args.client.databases.query({
+				database_id: args.databaseID,
+				page_size: 100,
+				start_cursor: body.start_cursor,
+			})
+
+			startCursor = res.next_cursor
+			hasMore = res.has_more
+
+			console.log(res)
+
+			res.results.forEach((page) => {
+				console.log(JSON.stringify(page, null, 2))
+				pages.push(page)
+			})
+		} catch (e) {
+			reporter.panic(e)
+		}
+	}
+
+	return pages
+}
+
+export const onPreInit: GatsbyNode["onPreInit"] = () => console.log("Loaded gatsby-starter-plugin")
 
 export const onPostBuild: GatsbyNode["onPostBuild"] = async ({ cache }) => {
 	await cache.set(`key`, `value`)
@@ -14,9 +55,27 @@ export const onPostBuild: GatsbyNode["onPostBuild"] = async ({ cache }) => {
 
 export const sourceNodes: GatsbyNode["sourceNodes"] = async (
 	{ actions, createContentDigest, createNodeId, reporter },
-	{ token, databaseId },
+	options,
 ) => {
-	console.log("🚌 Source")
+	const { token, databaseId } = options as { token?: string; databaseId?: string }
+
+	console.log(token, databaseId)
+
+	if (!token) {
+		reporter.panic("Notion Source - API Token required")
+		return
+	}
+
+	if (!databaseId) {
+		reporter.panic("Notion Source - Target Database-ID required")
+		return
+	}
+
+	var notion = new Client({ auth: token })
+
+	// const pages = await fetchPages({ client: notion, databaseID: databaseId }, reporter)
+
+	// reporter.format(pages)
 
 	// const pages = await getPages({ token, databaseId }, reporter)
 	// pages.forEach((page) => {
