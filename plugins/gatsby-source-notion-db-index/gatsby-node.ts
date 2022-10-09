@@ -71,11 +71,11 @@ export const sourceNodes: GatsbyNode["sourceNodes"] = async (
 		return
 	}
 
-	var notion = new Client({ auth: token })
+	const notion = new Client({ auth: token })
 
-	// const pages = await fetchPages({ client: notion, databaseID: databaseId }, reporter)
+	const pages = await fetchPages({ client: notion, databaseID: databaseId }, reporter)
 
-	// reporter.format(pages)
+	reporter.format(pages)
 
 	// const pages = await getPages({ token, databaseId }, reporter)
 	// pages.forEach((page) => {

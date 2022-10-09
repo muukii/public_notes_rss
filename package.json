@@ -8,6 +8,7 @@
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "dependencies": {
+    "@notionhq/client": "^2.2.1",
     "gatsby": "^4.24.3",
     "gatsby-plugin-feed": "^4.24.0",
     "gatsby-plugin-gatsby-cloud": "^4.24.0",
